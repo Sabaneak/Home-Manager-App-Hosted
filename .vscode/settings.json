@@ -1,0 +1,11 @@
+{
+    "python.linting.pylintEnabled": true,
+    "python.linting.flake8Enabled": false,
+    "python.linting.enabled": true,
+    "timeline.excludeSources": [],
+    "python.linting.pylintArgs": [
+        "--load-plugins",
+        "pylint-flask"
+    ],
+    "python.pythonPath": "C:\\Users\\akhil\\.virtualenvs\\OOPS-Project-server-wBE-ExZr\\Scripts\\python.exe"
+}
