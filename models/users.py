@@ -21,13 +21,13 @@ class UserModel(db.Model):
     
     email = db.Column(db.String(80), nullable=False, unique=True)
     phone = db.Column(db.String(30), nullable=False, unique=True)
-    phone_activated = db.Column(db.Boolean, default=False)
-    email_activated = db.Column(db.Boolean, default=False)
+    phone_activated = db.Column(db.Boolean, default=True)
+    email_activated = db.Column(db.Boolean, default=True)
     otp = db.Column(db.String(10))
 
-    cards = db.relationship("CardsModel", lazy="dynamic")
-    diary = db.relationship("DiaryModel", lazy="dynamic")
-    stock = db.relationship("StockModel", lazy="dynamic")
+    cards = db.relationship("CardsModel")
+    diary = db.relationship("DiaryModel")
+    stock = db.relationship("StockModel")
 
     @classmethod
     def find_by_username(cls, username):
@@ -71,7 +71,7 @@ class UserModel(db.Model):
         Params : none
         Output : redirect to mail library
         """  
-        link = request.url_root[:-1] + url_for("emailconfirm", _id=self.id)
+        link = request.url_root[:-1] + url_for("emailconfirm", user_id=self.id)
         html = f'<html>Please click the link to join your meeting: <a href={link}>{link}</a></html>'
         return Send_Email.send_email(self.email, html=html)
 

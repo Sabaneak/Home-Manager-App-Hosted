@@ -24,23 +24,23 @@ class UserRegister(Resource):
     """
     @classmethod
     def post(cls):
-        try:
-            body = request.get_json()
-            user = user_schema.load(body)
-            
-            if UserModel.find_by_username(user.username):
-                return {'msg': 'Username {} already exists'.format(user.username)}
+        # try:
+        body = request.get_json()
+        user = user_schema.load(body)
+        
+        if UserModel.find_by_username(user.username):
+            return {'msg': 'Username {} already exists'.format(user.username)}, 404
 
-            if UserModel.find_by_email(user.email):
-                return {'msg': 'Email {} already exists'.format(user.email)}
-            
-            user.save_to_data()
-            user.send_confirmation_email()
-            user.sms()
-            return {'msg': 'User has been added to database. Verification pending.'}, 200
+        if UserModel.find_by_email(user.email):
+            return {'msg': 'Email {} already exists'.format(user.email)}, 404
+        
+        user.save_to_data()
+        # user.send_confirmation_email()
+        # user.sms()
+        return {'msg': 'User has been added to database. Verification pending.'}, 200
 
-        except Exception as e:
-            return {'msg':str(e)}, 500
+        # except Exception as e:
+        #     return {'msg':str(e)}, 500
 
 class EmailConfirm(Resource):
     """
@@ -94,8 +94,7 @@ class UserLogin(Resource):
     def post(cls):
         try:
             body = request.get_json()
-            user = user_schema.load(body)
-            user_from_db = UserModel.find_by_username(user.username)
+            user_from_db = UserModel.find_by_username(body['username'])
             check = (body['password'] == user_from_db.password)
 
             if not check:

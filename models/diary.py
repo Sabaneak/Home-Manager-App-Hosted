@@ -9,7 +9,7 @@ class DiaryModel(db.Model):
     date = db.Column(db.DateTime, default=datetime.datetime.now())
     time = db.Column(db.DateTime, default=datetime.datetime.now())
     title = db.Column(db.String(20))
-    text = db.Column(db.String(20))
+    text = db.Column(db.String(50))
     added_by = db.Column(db.Integer, db.ForeignKey("Users.id"))
     user = db.relationship("UserModel")
     

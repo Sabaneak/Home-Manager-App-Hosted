@@ -77,7 +77,7 @@ class StockList(Resource):
     @jwt_required
     def get(cls):
         try:
-            return {'Tasks': stock_list_schema.dump(StockModel.find_all())}, 200
+            return {'Stock': stock_list_schema.dump(StockModel.find_all())}, 200
         except Exception as e:
             return {'msg':str(e)}, 500
 

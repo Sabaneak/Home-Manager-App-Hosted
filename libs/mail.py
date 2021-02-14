@@ -25,10 +25,10 @@ class Send_Email:
             to_emails= receiver,
             subject='Confirm Email Address',
             html_content= html)
-        try:
-            response = sg.send(message)
-        except Exception as e:
-            print(e.message)
+        # try:
+        response = sg.send(message)
+        # except Exception as e:
+        #     print(e.message)
 
     @classmethod
     def send_reminder(cls, receiver, html, unix):

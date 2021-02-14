@@ -43,7 +43,7 @@ class Diary(Resource):
             diary = DiaryModel.find_by_id(_id)
             if stock:
                 return diary_schema.dump(diary), 200
-            return {'msg': "No such task exists"}, 404
+            return {'msg': "No such diary entry exists"}, 404
 
         except Exception as e:
             return {'msg':str(e)}, 500
