@@ -1,7 +1,11 @@
 from flask_restful import Resource
 from flask import request, Response, jsonify
-from models.models import UserModel, DiaryModel
+from models.diary import DiaryModel
+from schemas.diary import DiarySchema
 from flask_jwt_extended import jwt_required, fresh_jwt_required, get_jwt_identity
+
+diary_schema = DiarySchema()
+diary_list_schema = DiarySchema(many=True)
 
 class Diary_Entry(Resource):
     """
@@ -13,12 +17,14 @@ class Diary_Entry(Resource):
         try:
             user_id = get_jwt_identity()
             body = request.get_json()
-            user = UserModel.objects.get(id=user_id)
-            diary = DiaryModel(**body, added_by=user)
-            diary.save()
-            user.update(push__diary=diary)
-            user.save()
-            return {'msg': "Diary entry was added to database"}, 200
+            diary = diary_schema.load(body)
+            diary.added_by = user_id
+
+            if DiaryModel.find_by_name(diary.title):
+                return {'msg': "Entry with that title already exists"}, 404
+
+            diary.save_to_data()
+            return {'msg': "Item was added to diary database"}, 200
         
         except Exception as e:
             return {'msg':str(e)}, 500
@@ -34,11 +40,10 @@ class Diary(Resource):
     @jwt_required
     def get(cls, _id):
         try:
-            user_id = get_jwt_identity()
-            diary = DiaryModel.objects(id=_id, added_by=user_id).exclude('added_by').to_json()
-            if not diary:
-                return {'msg': 'Diary entry does not exist'}, 400
-            return Response(diary, mimetype="application/json", status=200)
+            diary = DiaryModel.find_by_id(_id)
+            if stock:
+                return diary_schema.dump(diary), 200
+            return {'msg': "No such task exists"}, 404
 
         except Exception as e:
             return {'msg':str(e)}, 500
@@ -47,13 +52,15 @@ class Diary(Resource):
     @jwt_required
     def put(cls, _id):
         try:
-            user_id = get_jwt_identity()
-            diary = DiaryModel.objects.get(id=_id, added_by=user_id)
+            diary = DiaryModel.find_by_id(_id)
+            given_diary = request.get_json()
+        
             if not diary:
-                return {'msg': 'Diary entry does not exist'}, 400
+                return {'msg': "No such diary entry exists"}
             
-            body = request.get_json()
-            DiaryModel.objects.get(id=_id).update(**body)
+            given_diary.id = diary.id
+            given_diary.save_to_data()
+            diary.delete_from_data()
             return {'msg': "Diary has been modified"}, 200
 
         except Exception as e:
@@ -68,9 +75,6 @@ class DiaryList(Resource):
     @jwt_required
     def get(cls):
         try:
-            user_id = get_jwt_identity()
-            diary = DiaryModel.objects(added_by=user_id).exclude('added_by').to_json()
-            return Response(diary, mimetype="application/json", status=200)
-        
+            return {'Tasks': stock_list_schema.dump(StockModel.find_all())}, 200
         except Exception as e:
             return {'msg':str(e)}, 500

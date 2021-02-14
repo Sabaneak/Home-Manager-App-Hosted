@@ -1,8 +1,14 @@
 from flask_restful import Resource
 from flask import request, Response, jsonify
-from models.models import UserModel, StockModel, CardsModel
+from models.stock import StockModel
+from models.cards import CardsModel
+from models.users import UserModel
+from schemas.stock import StockSchema
 import arrow
 from flask_jwt_extended import jwt_required, fresh_jwt_required, get_jwt_identity
+
+stock_schema = StockSchema()
+stock_list_schema = StockSchema(many=True)
 
 class Stock_Entry(Resource):
     """
@@ -15,11 +21,13 @@ class Stock_Entry(Resource):
         try:
             user_id = get_jwt_identity()
             body = request.get_json()
-            user = UserModel.objects.get(id=user_id)
-            stock = StockModel(**body, added_by=user)
-            stock.save()
-            user.update(push__stock=stock)
-            user.save()
+            stock = stock_schema.load(body)
+            stock.added_by = user_id
+
+            if StockModel.find_by_name(stock.item):
+                return {'msg': "Item already exists"}, 404
+
+            stock.save_to_data()
             return {'msg': "Item was added to stock database"}, 200
         
         except Exception as e:
@@ -36,11 +44,10 @@ class Stock(Resource):
     @jwt_required
     def get(cls, item):
         try:
-            user_id = get_jwt_identity()
-            stock = StockModel.objects(item=item).exclude('added_by').to_json()
-            if not stock:
-                return {'msg': 'Item does not exist'}, 400
-            return Response(stock, mimetype="application/json", status=200)
+            stock = StockModel.find_by_name(item)
+            if stock:
+                return stock_schema.dump(stock), 200
+            return {'msg': "No such item exists"}, 404
 
         except Exception as e:
             return {'msg':str(e)}, 500
@@ -50,15 +57,16 @@ class Stock(Resource):
     @fresh_jwt_required
     def delete(cls, item):
         try:
-            user_id = get_jwt_identity()
-            stock = StockModel.objects.get(id=_id, added_by=user_id)
-            if not stock:
-                return {'msg': 'Item does not exist'}, 400
-            stock.delete()
-            return {'msg': "Item has been deleted"}, 200
-
+            stock = StockModel.find_by_name(item)
+        
+            if stock:
+                stock.delete_from_data()
+                return {'msg': "Item has been deleted"}, 200
+            return {'msg': "No such item exists"}, 404
+        
         except Exception as e:
             return {'msg':str(e)}, 500
+
 
         
 class StockList(Resource):
@@ -69,12 +77,10 @@ class StockList(Resource):
     @jwt_required
     def get(cls):
         try:
-            user_id = get_jwt_identity()
-            stock = StockModel.objects(added_by=user_id).exclude('added_by').to_json()
-            return Response(stock, mimetype="application/json", status=200)
-        
+            return {'Tasks': stock_list_schema.dump(StockModel.find_all())}, 200
         except Exception as e:
             return {'msg':str(e)}, 500
+
 
 class Check_Refill(Resource):
     """
@@ -86,21 +92,22 @@ class Check_Refill(Resource):
     def post(cls):
         try:
             user_id = get_jwt_identity()
-            user = UserModel.objects.get(id=user_id)
-            cards = CardsModel.objects(added_by=user_id)
+            user = UserModel.find_by_id(id=user_id)
+            cards = CardsModel.find_all()
+
             for card in cards:
                 if card.category == 'Refill':
                     current_time = arrow.now()
                     
-                    if current_time.timestamp < user.get_date_time(card.date, card.time):
+                    if current_time.timestamp < user.get_date_time(card.data['date'], card.data['time']):
                         return {'msg': "Still not time to refill"}, 200
 
                     else:
                         try:
-                            stock_card = StockModel.objects.get(added_by=user_id, item=card.item)
-                            stock_card.count = stock_card.count + card.count
-                            stock_card.save()
-                            card.delete()
+                            stock_card = StockModel.find_by_name(item=card.item)
+                            stock_card.count = stock_card.count + card.data['count']
+                            stock_card.save_to_data()
+                            card.delete_from_data()
                             return {'msg': 'Item {} has been refilled'.format(stock_card.item)}, 200
                         except:
                             return {'msg': "Item you want to refill does not exist in your stock"}, 200           

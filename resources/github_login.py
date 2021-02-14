@@ -9,7 +9,7 @@ import string
 from flask_bcrypt import generate_password_hash
 from decouple import config
 
-from models.models import UserModel
+from models.users import UserModel
 
 class GithubLogin(Resource):
     @classmethod
@@ -45,7 +45,7 @@ class GithubAuthorize(Resource):
         except:
             return {'msg': "User of this account does not exist in database"}, 400
 
-        user = UserModel.objects.get(email=github_email)
+        user = UserModel.find_by_email(email=github_email)
         access_token = create_access_token(identity=str(user.id), fresh=True)
         refresh_token = create_refresh_token(str(user.id))
 

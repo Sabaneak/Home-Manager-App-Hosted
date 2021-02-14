@@ -7,5 +7,5 @@
         "--load-plugins",
         "pylint-flask"
     ],
-    "python.pythonPath": "C:\\Users\\akhil\\.virtualenvs\\OOPS-Project-server-wBE-ExZr\\Scripts\\python.exe"
+    "python.pythonPath": "C:\\Users\\akhil\\.virtualenvs\\Home-Manager-App-Hosted-oTJzRhI8\\Scripts\\python.exe"
 }

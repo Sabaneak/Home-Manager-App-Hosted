@@ -1,4 +1,5 @@
-from models.models import UserModel
+from models.users import UserModel
+from schemas.users import UserSchema
 
 from flask import request, redirect, url_for
 from flask_restful import Resource
@@ -13,6 +14,7 @@ from flask_jwt_extended import (
     fresh_jwt_required
 )
 from blacklist import BLACKLIST
+user_schema = UserSchema()
 
 class UserRegister(Resource):
     """
@@ -24,18 +26,15 @@ class UserRegister(Resource):
     def post(cls):
         try:
             body = request.get_json()
+            user = user_schema.load(body)
             
-            if 'email' not in body:
-                return {'msg': 'Email has not been provided'}, 400
+            if UserModel.find_by_username(user.username):
+                return {'msg': 'Username {} already exists'.format(user.username)}
 
-            if 'phone' not in body:
-                return {'msg': 'Phone Number has not been provided'}, 400
-
-            if 'profession' not in body:
-                return {'msg': 'Profession has not been provided'}, 400
-
-            user = UserModel(**body)
-            user.save()
+            if UserModel.find_by_email(user.email):
+                return {'msg': 'Email {} already exists'.format(user.email)}
+            
+            user.save_to_data()
             user.send_confirmation_email()
             user.sms()
             return {'msg': 'User has been added to database. Verification pending.'}, 200
@@ -50,7 +49,7 @@ class EmailConfirm(Resource):
     @classmethod
     def get(cls, _id):
         try:
-            user = UserModel.objects.get(id=_id)
+            user = UserModel.find_by_id(id=_id)
 
             if not user:
                 return {'msg': "User does not exist"}, 400
@@ -58,9 +57,8 @@ class EmailConfirm(Resource):
             if user.email_activated:
                 return {'msg': "Already confirmed"}, 400
 
-            UserModel.objects.get(id=_id).update(email_activated=True)
-            user.reload()
-            user.save()
+            user = email_activated=True
+            user.save_to_data()
             return {'msg': "Registration has been confirmed for email {}".format(user.email)}, 200
 
         except Exception as e:
@@ -74,14 +72,13 @@ class OTPConfirm(Resource):
     @classmethod
     def get(cls, otp):
         try:
-            user = UserModel.objects.get(otp=otp)
+            user = UserModel.find_by_otp(otp=otp)
             
             if user.phone_activated:
                 return {'msg': "Already confirmed"}, 400
 
-            user.update(phone_activated=True)
-            user.reload()
-            user.save()
+            user.phone_activated=True
+            user.save_to_data()
             return {'msg': "Registration has been confirmed for phone {}".format(user.phone)}, 200
 
         except:
@@ -97,20 +94,21 @@ class UserLogin(Resource):
     def post(cls):
         try:
             body = request.get_json()
-            user = UserModel.objects.get(username=body.get('username'))
-            check = (body.get('password') == user.password)
+            user = user_schema.load(body)
+            user_from_db = UserModel.find_by_username(user.username)
+            check = (body['password'] == user_from_db.password)
 
             if not check:
                 return {'msg': 'Credentials are not matching. Please try again'}, 400
 
-            if not user.email_activated:
+            if not user_from_db.email_activated:
                 return {'msg': 'Email has not been confirmed'}, 400
 
-            if not user.phone_activated:
+            if not user_from_db.phone_activated:
                 return {'msg': 'Phone has not been confirmed'}, 400
                 
-            access_token = create_access_token(identity=str(user.id), fresh=True)
-            refresh_token = create_refresh_token(str(user.id))
+            access_token = create_access_token(identity=str(user_from_db.id), fresh=True)
+            refresh_token = create_refresh_token(str(user_from_db.id))
             return { 'access_token': access_token, 'refresh_token': refresh_token}, 200
         
         except Exception as e:
@@ -142,19 +140,6 @@ class TokenRefresh(Resource):
         return {'access_token': new_token}, 200
 
 
-class CheckUsername(Resource):
-    """
-    Class to verify if username is available
-    """
-    @classmethod
-    def get(cls, username):
-        try:
-            user = UserModel.objects.get(username=username)
-            return {'msg': "Username already exists"}, 200
-        except:
-            return {'msg': "Username does not exist"}, 400
-
-
 class ChangePassword(Resource):
     """
     Class that replaces your existing password with a new one
@@ -164,8 +149,7 @@ class ChangePassword(Resource):
     def post(cls, password):
         try:
             user_id = get_jwt_identity()
-            UserModel.objects.get(id=user_id).update(password=password)
-            user = UserModel.objects.get(id=user_id)
+            user = UserModel.find_by_id(id=user_id)
             
             if not user:
                 return {'msg': 'User does not exist'}, 400
