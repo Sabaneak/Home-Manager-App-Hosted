@@ -24,23 +24,23 @@ class UserRegister(Resource):
     """
     @classmethod
     def post(cls):
-        # try:
-        body = request.get_json()
-        user = user_schema.load(body)
-        
-        if UserModel.find_by_username(user.username):
-            return {'msg': 'Username {} already exists'.format(user.username)}, 404
+        try:
+            body = request.get_json()
+            user = user_schema.load(body)
+            
+            if UserModel.find_by_username(user.username):
+                return {'msg': 'Username {} already exists'.format(user.username)}, 404
 
-        if UserModel.find_by_email(user.email):
-            return {'msg': 'Email {} already exists'.format(user.email)}, 404
-        
-        user.save_to_data()
-        # user.send_confirmation_email()
-        # user.sms()
-        return {'msg': 'User has been added to database. Verification pending.'}, 200
+            if UserModel.find_by_email(user.email):
+                return {'msg': 'Email {} already exists'.format(user.email)}, 404
+            
+            user.save_to_data()
+            user.send_confirmation_email()
+            user.sms()
+            return {'msg': 'User has been added to database. Verification pending.'}, 200
 
-        # except Exception as e:
-        #     return {'msg':str(e)}, 500
+        except Exception as e:
+            return {'msg':str(e)}, 500
 
 class EmailConfirm(Resource):
     """
@@ -49,7 +49,7 @@ class EmailConfirm(Resource):
     @classmethod
     def get(cls, _id):
         try:
-            user = UserModel.find_by_id(id=_id)
+            user = UserModel.find_by_user_id(id=_id)
 
             if not user:
                 return {'msg': "User does not exist"}, 400
@@ -108,6 +108,7 @@ class UserLogin(Resource):
                 
             access_token = create_access_token(identity=str(user_from_db.id), fresh=True)
             refresh_token = create_refresh_token(str(user_from_db.id))
+            print(user_schema.dump(user_from_db))
             return { 'access_token': access_token, 'refresh_token': refresh_token}, 200
         
         except Exception as e:
@@ -148,7 +149,7 @@ class ChangePassword(Resource):
     def post(cls, password):
         try:
             user_id = get_jwt_identity()
-            user = UserModel.find_by_id(id=user_id)
+            user = UserModel.find_by_user_id(id=user_id)
             
             if not user:
                 return {'msg': 'User does not exist'}, 400

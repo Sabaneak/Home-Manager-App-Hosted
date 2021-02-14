@@ -10,11 +10,6 @@ class CardsModel(db.Model):
     data = db.Column(JSON)
     added_by = db.Column(db.Integer, db.ForeignKey("Users.id"))
     user = db.relationship("UserModel")
-    
-    @classmethod
-    def find_by_name(cls, name):
-        ID = get_jwt_identity()
-        return cls.query.filter_by(name=name, added_by=ID).first()
 
     @classmethod
     def find_by_id(cls, _id):

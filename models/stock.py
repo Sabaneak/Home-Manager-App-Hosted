@@ -11,9 +11,9 @@ class StockModel(db.Model):
     user = db.relationship("UserModel")
     
     @classmethod
-    def find_by_name(cls, name):
+    def find_by_item(cls, item):
         ID = get_jwt_identity()
-        return cls.query.filter_by(name=name, added_by=ID).first()
+        return cls.query.filter_by(item=item, added_by=ID).first()
 
     @classmethod
     def find_by_id(cls, _id):

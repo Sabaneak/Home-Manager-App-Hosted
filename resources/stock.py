@@ -24,7 +24,7 @@ class Stock_Entry(Resource):
             stock = stock_schema.load(body)
             stock.added_by = user_id
 
-            if StockModel.find_by_name(stock.item):
+            if StockModel.find_by_item(stock.item):
                 return {'msg': "Item already exists"}, 404
 
             stock.save_to_data()
@@ -36,15 +36,15 @@ class Stock_Entry(Resource):
 
 class Stock(Resource):
     """
-    Class to get or delete an item by name
-    Params: name of item (Obtaining by stock/all)
+    Class to get or delete an item by item
+    Params: item of item (Obtaining by stock/all)
     Output: item is displayed/deleted
     """
     @classmethod
     @jwt_required
     def get(cls, item):
         try:
-            stock = StockModel.find_by_name(item)
+            stock = StockModel.find_by_item(item)
             if stock:
                 return stock_schema.dump(stock), 200
             return {'msg': "No such item exists"}, 404
@@ -57,7 +57,7 @@ class Stock(Resource):
     @fresh_jwt_required
     def delete(cls, item):
         try:
-            stock = StockModel.find_by_name(item)
+            stock = StockModel.find_by_item(item)
         
             if stock:
                 stock.delete_from_data()
@@ -92,7 +92,7 @@ class Check_Refill(Resource):
     def post(cls):
         try:
             user_id = get_jwt_identity()
-            user = UserModel.find_by_id(id=user_id)
+            user = UserModel.find_by_user_id(user_id)
             cards = CardsModel.find_all()
 
             for card in cards:
@@ -104,7 +104,7 @@ class Check_Refill(Resource):
 
                     else:
                         try:
-                            stock_card = StockModel.find_by_name(item=card.item)
+                            stock_card = StockModel.find_by_item(item=card.data['item'])
                             stock_card.count = stock_card.count + card.data['count']
                             stock_card.save_to_data()
                             card.delete_from_data()
