@@ -17,7 +17,7 @@ from oa import initialize_oauth
 app = Flask(__name__)
 load_dotenv(".env")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = config('DATABASE_URI')
+app.config['SQLALCHEMY_DATABASE_URI'] = config('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['PROPOGATE_EXCEPTIONS'] = True
 app.config['JWT_BLACKLIST_ENABLED'] = False

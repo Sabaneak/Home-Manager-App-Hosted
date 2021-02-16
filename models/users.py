@@ -71,7 +71,7 @@ class UserModel(db.Model):
         Params : none
         Output : redirect to mail library
         """  
-        link = request.url_root[:-1] + url_for("emailconfirm", user_id=self.id)
+        link = request.url_root[:-1] + url_for("emailconfirm", _id=self.id)
         html = f'<html>Please click the link to join your meeting: <a href={link}>{link}</a></html>'
         return Send_Email.send_email(self.email, html=html)
 
