@@ -21,8 +21,8 @@ class UserModel(db.Model):
     
     email = db.Column(db.String(80), nullable=False, unique=True)
     phone = db.Column(db.String(30), nullable=False, unique=True)
-    phone_activated = db.Column(db.Boolean, default=True)
-    email_activated = db.Column(db.Boolean, default=True)
+    phone_activated = db.Column(db.Boolean, default=False)
+    email_activated = db.Column(db.Boolean, default=False)
     otp = db.Column(db.String(10))
 
     cards = db.relationship("CardsModel")

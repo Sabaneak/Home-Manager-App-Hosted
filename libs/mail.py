@@ -7,7 +7,7 @@ class Send_Email:
     Library to send emails via Sendgrid API.
     Env variables: API_key, From_email
     """
-    SENDGRID_API_KEY = config('SENDGRID_API_KEY')
+    SENDGRID_API = config('SENDGRID_API_KEY')
     FROM_EMAIL = config('FROM_EMAIL')
 
     @classmethod
@@ -19,16 +19,16 @@ class Send_Email:
             html: Text to be sent with email
         Output: Email sent
         """
-        sg = sendgrid.SendGridAPIClient(cls.SENDGRID_API_KEY)
+        sg = sendgrid.SendGridAPIClient(cls.SENDGRID_API)
         message = Mail(
             from_email= cls.FROM_EMAIL,
             to_emails= receiver,
             subject='Confirm Email Address',
             html_content= html)
-        # try:
-        response = sg.send(message)
-        # except Exception as e:
-        #     print(e.message)
+        try:
+            response = sg.send(message)
+        except Exception as e:
+            print(e.message)
 
     @classmethod
     def send_reminder(cls, receiver, html, unix):

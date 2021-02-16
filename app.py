@@ -15,6 +15,7 @@ from oa import initialize_oauth
 
 
 app = Flask(__name__)
+basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(".env")
 
 app.config['SQLALCHEMY_DATABASE_URI'] = config('DATABASE_URL')
