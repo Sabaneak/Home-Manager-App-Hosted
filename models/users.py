@@ -81,8 +81,8 @@ class UserModel(db.Model):
         Params : none
         Output : redirect to mail library
         """  
-        link = card.url
-        html = f'<html><p> <a href={link}>{link}</a><br>Remember to bring your {card.documents}</p></html>'
+        link = card.data['url']
+        html = f'<html><p> <a href={link}>{link}</a><br>Remember to bring your {card.data["documents"]}</p></html>'
         return Send_Email.send_reminder(self.email, html=html, unix=unix)
 
     def send_reminder_email(self, card, unix):

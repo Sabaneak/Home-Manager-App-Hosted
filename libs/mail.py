@@ -7,7 +7,7 @@ class Send_Email:
     Library to send emails via Sendgrid API.
     Env variables: API_key, From_email
     """
-    SENDGRID_API = config('SENDGRID_API_KEY')
+    SENDGRID_API = config('SENDGRID_API')
     FROM_EMAIL = config('FROM_EMAIL')
 
     @classmethod
@@ -40,7 +40,7 @@ class Send_Email:
             unix: Unix timestamp of time of email delivery
         Output: Email sent
         """
-        sg = sendgrid.SendGridAPIClient(cls.SENDGRID_API_KEY)
+        sg = sendgrid.SendGridAPIClient(cls.SENDGRID_API)
         from_email = Email(cls.FROM_EMAIL)
         to_email = To(receiver)
         subject = "Meeting Reminder"

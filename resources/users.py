@@ -49,7 +49,7 @@ class EmailConfirm(Resource):
     @classmethod
     def get(cls, _id):
         try:
-            user = UserModel.find_by_user_id(id=_id)
+            user = UserModel.find_by_user_id(_id)
 
             if not user:
                 return {'msg': "User does not exist"}, 400
@@ -57,7 +57,7 @@ class EmailConfirm(Resource):
             if user.email_activated:
                 return {'msg': "Already confirmed"}, 400
 
-            user = email_activated=True
+            user.email_activated=True
             user.save_to_data()
             return {'msg': "Registration has been confirmed for email {}".format(user.email)}, 200
 
@@ -149,7 +149,7 @@ class ChangePassword(Resource):
     def post(cls, password):
         try:
             user_id = get_jwt_identity()
-            user = UserModel.find_by_user_id(id=user_id)
+            user = UserModel.find_by_user_id(user_id)
             
             if not user:
                 return {'msg': 'User does not exist'}, 400

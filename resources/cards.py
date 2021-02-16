@@ -25,7 +25,7 @@ class Input_Cards(Resource):
     def post(cls):
         try:
             user_id = get_jwt_identity()
-            user = UserModel.find_by_id(user_id)
+            user = UserModel.find_by_user_id(user_id)
             body = request.get_json()
 
             card = card_schema.load(body)
@@ -62,7 +62,7 @@ class Cards(Resource):
             card = CardsModel.find_by_id(_id)
             if card:
                 return card_schema.dump(card), 200
-            return {'msg': "No such task exists"}, 404
+            return {'msg': "No such card exists"}, 404
 
         except Exception as e:
             return {'msg':str(e)}, 500
@@ -71,20 +71,24 @@ class Cards(Resource):
     @jwt_required
     def put(cls, _id):
         try:
+            user_id = get_jwt_identity()
+            user = UserModel.find_by_user_id(user_id)
+            body = request.get_json()
             card = CardsModel.find_by_id(_id)
-            given_card = request.get_json()
         
             if not card:
                 return {'msg': "No such card entry exists"}
             
-            given_card.id = card.id
-            given_card.save_to_data()
+            new_card = card_schema.load(body)
+            new_card.id = card.id
+            new_card.added_by = card.added_by
             card.delete_from_data()
+            new_card.save_to_data()
             
-            if given_card.category == 'Meeting':
+            if new_card.category == 'Meeting':
                 user.send_meeting_email(card, user.get_date_time(given_card.data['date'],given_card.data['time']))
             
-            if given_card.category == 'Reminder':
+            if new_card.category == 'Reminder':
                 dates = [record['date'] for record in given_card.data['reminderList']]
                 times = [record['time'] for record in given_card.data['reminderList']]
                 unix = [] 
@@ -145,7 +149,7 @@ class CardsList(Resource):
     @jwt_required
     def get(cls):
         try:
-            return {'Tasks': stock_list_schema.dump(StockModel.find_all())}, 200
+            return {'Cards': card_list_schema.dump(CardsModel.find_all())}, 200
         except Exception as e:
             return {'msg':str(e)}, 500
 

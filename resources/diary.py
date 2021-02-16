@@ -19,12 +19,8 @@ class Diary_Entry(Resource):
             body = request.get_json()
             diary = diary_schema.load(body)
             diary.added_by = user_id
-
-            if DiaryModel.find_by_name(diary.title):
-                return {'msg': "Entry with that title already exists"}, 404
-
             diary.save_to_data()
-            return {'msg': "Item was added to diary database"}, 200
+            return {'msg': "Diary entry was added to diary database"}, 200
         
         except Exception as e:
             return {'msg':str(e)}, 500
@@ -41,7 +37,7 @@ class Diary(Resource):
     def get(cls, _id):
         try:
             diary = DiaryModel.find_by_id(_id)
-            if stock:
+            if diary:
                 return diary_schema.dump(diary), 200
             return {'msg': "No such diary entry exists"}, 404
 
@@ -53,14 +49,16 @@ class Diary(Resource):
     def put(cls, _id):
         try:
             diary = DiaryModel.find_by_id(_id)
-            given_diary = request.get_json()
+            body = request.get_json()
         
             if not diary:
                 return {'msg': "No such diary entry exists"}
             
+            given_diary = diary_schema.load(body)
             given_diary.id = diary.id
-            given_diary.save_to_data()
+            given_diary.added_by = diary.added_by
             diary.delete_from_data()
+            given_diary.save_to_data()
             return {'msg': "Diary has been modified"}, 200
 
         except Exception as e:
@@ -75,6 +73,6 @@ class DiaryList(Resource):
     @jwt_required
     def get(cls):
         try:
-            return {'Tasks': stock_list_schema.dump(StockModel.find_all())}, 200
+            return {'Diary Entries': diary_list_schema.dump(DiaryModel.find_all())}, 200
         except Exception as e:
             return {'msg':str(e)}, 500

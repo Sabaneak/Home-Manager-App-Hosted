@@ -17,7 +17,7 @@ class GithubLogin(Resource):
         """
         Redirects user to login. If already in, redirects to authorize endpoint
         """
-        return github.authorize(url_for("github.authorize", _external=True)), 200
+        return github.authorize(url_for("github.authorize", _external=True))
 
 
 class GithubAuthorize(Resource):
@@ -29,6 +29,7 @@ class GithubAuthorize(Resource):
         """
         try:
             response = github.authorized_response()
+            print(response)
         except:
              return { "msg": request.args["error"]}        
         
