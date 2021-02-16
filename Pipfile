@@ -74,6 +74,7 @@ google-auth-oauthlib = "*"
 oauth2client = "*"
 celery = {extras = ["radis"], version = "*"}
 psycopg2-binary = "*"
+flask-migrate = "*"
 
 [dev-packages]
 

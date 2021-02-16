@@ -6,6 +6,7 @@ from flask_restful import Api
 from flask_jwt_extended import JWTManager
 from flask_cors import CORS
 from dotenv import load_dotenv
+from flask_migrate import Migrate
 
 from resources.routes import initialize_routes
 from db import db
@@ -28,6 +29,7 @@ app.secret_key = os.urandom(24)
 CORS(app)
 api = Api(app)
 jwt = JWTManager(app)
+migrate = Migrate(app, db)
 
 @app.before_first_request
 def table():
