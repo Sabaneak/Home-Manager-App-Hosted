@@ -9,8 +9,6 @@ from dotenv import load_dotenv
 from flask_migrate import Migrate
 
 from resources.routes import initialize_routes
-from db import db
-from ma import ma
 from blacklist import BLACKLIST
 from oa import initialize_oauth
 
@@ -33,4 +31,8 @@ initialize_routes(api)
 initialize_oauth(app)
 
 if __name__ == '__main__':
+    from db import db
+    from ma import ma
+    db.init_app(app)
+    ma.init_app(app)
     app.run(debug=True, use_reloader=False)  
