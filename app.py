@@ -29,7 +29,6 @@ app.secret_key = os.urandom(24)
 CORS(app)
 api = Api(app)
 jwt = JWTManager(app)
-migrate = Migrate(app, db)
 initialize_routes(api)
 initialize_oauth(app)
 
