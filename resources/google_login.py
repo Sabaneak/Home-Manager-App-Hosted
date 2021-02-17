@@ -29,6 +29,7 @@ class GoogleAuthorize(Resource):
         """
         try:
             response = google.authorized_response()
+            print(response)
         except:
              return { "msg": request.args["error"]}        
         
