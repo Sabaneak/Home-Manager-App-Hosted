@@ -29,12 +29,11 @@ class GoogleAuthorize(Resource):
         """
         try:
             response = google.authorized_response()
-            print(response)
         except:
              return { "msg": request.args["error"]}        
         
-        token_access = response['access_token']
-        user = google.get('userinfo', token=token_access)  
+        g.token_access = response['access_token']
+        user = google.get('userinfo', token=g.token_access)  
 
         try:
             google_email = user.data['email']
@@ -45,4 +44,4 @@ class GoogleAuthorize(Resource):
         access_token = create_access_token(identity=str(user.id), fresh=True)
         refresh_token = create_refresh_token(str(user.id))
 
-        return {'access_token': access_token, 'refresh_token': refresh_token, 'calendar_access': token_access}, 200
+        return {'access_token': access_token, 'refresh_token': refresh_token, 'calendar_access': g.token_access}, 200
