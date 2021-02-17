@@ -33,6 +33,4 @@ initialize_routes(api)
 initialize_oauth(app)
 
 if __name__ == '__main__':
-    db.init_app(app)
-    ma.init_app(app)
     app.run(debug=True, use_reloader=False)  
