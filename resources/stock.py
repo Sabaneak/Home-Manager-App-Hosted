@@ -97,9 +97,9 @@ class Check_Refill(Resource):
 
             for card in cards:
                 if card.category == 'Refill':
-                    current_time = arrow.now()
+                    current_time = arrow.utcnow().to('Asia/Kolkata')
                     
-                    if current_time.timestamp < user.get_date_time(card.data['date'], card.data['time']):
+                    if current_time.timestamp < user.get_date_time(card.data['date_time']):
                         return {'msg': "Still not time to refill"}, 200
 
                     else:

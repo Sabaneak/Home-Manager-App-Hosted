@@ -33,14 +33,12 @@ class Input_Cards(Resource):
             card.save_to_data()
 
             if card.category == 'Meeting':
-                user.send_meeting_email(card, user.get_date_time(card.data['date'],card.data['time']))
+                user.send_meeting_email(card, user.get_date_time(card.data['date_time']))
             
             if card.category == 'Reminder':
-                dates = [record['date'] for record in card.data['reminderList']]
-                times = [record['time'] for record in card.data['reminderList']]
                 unix = [] 
-                for i in range(len(dates)):
-                    unix[i] =unix.append(user.get_date_time(dates[i], times[i]))
+                for i in range(len(card.data['date_times'])):
+                    unix[i] =unix.append(user.get_date_time(card.data['date_times'][i]))
                     user.send_reminder_email(card, unix[i])
             
             return {'msg': "Card was added to database"}, 200
@@ -86,14 +84,12 @@ class Cards(Resource):
             new_card.save_to_data()
             
             if new_card.category == 'Meeting':
-                user.send_meeting_email(card, user.get_date_time(given_card.data['date'],given_card.data['time']))
+                user.send_meeting_email(card, user.get_date_time(new_card.data['date_time']))
             
             if new_card.category == 'Reminder':
-                dates = [record['date'] for record in given_card.data['reminderList']]
-                times = [record['time'] for record in given_card.data['reminderList']]
                 unix = [] 
-                for i in range(len(dates)):
-                    unix[i] =unix.append(user.get_date_time(dates[i], times[i]))
+                for i in range(len(new_card.data['date_times'])):
+                    unix[i] =unix.append(user.get_date_time(new_card.data['date_times'][i]))
                     user.send_reminder_email(card, unix[i])
             
             return {'msg': "Card has been modified"}, 200

@@ -53,16 +53,14 @@ class UserModel(db.Model):
         db.session.delete(self)
         db.session.commit()
     
-    def get_date_time(self, date, time): 
+    def get_date_time(self, date_time): 
         """
         Helper function to convert date time entered by user into unix timestamp
         Params : date, time (datetime strings)
         Output : unix timestamp
         """  
-        date_obj = arrow.get(date).date()
-        time_obj = arrow.get(time).time()
-        new_date_time = datetime.datetime.combine(date_obj, time_obj)
-        unix = int(new_date_time.timestamp())
+        date_time = arrow.get(date_time)
+        unix = int(date_time.timestamp)
         return unix
 
     def send_confirmation_email(self):

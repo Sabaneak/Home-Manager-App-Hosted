@@ -108,7 +108,6 @@ class UserLogin(Resource):
                 
             access_token = create_access_token(identity=str(user_from_db.id), fresh=True)
             refresh_token = create_refresh_token(str(user_from_db.id))
-            print(user_schema.dump(user_from_db))
             return { 'access_token': access_token, 'refresh_token': refresh_token}, 200
         
         except Exception as e:
