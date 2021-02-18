@@ -134,7 +134,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"username\" : \"akhil\",\n  \"password\" : \"aA+1bfH$\"\n}"
+							"raw": "{\n  \"username\" : \"Sabaneak\",\n  \"password\" : \"aA+1bfH$\"\n}"
 						},
 						"url": {
 							"raw": "{{url}}/login",
@@ -352,6 +352,59 @@
 					"response": []
 				},
 				{
+					"name": "Google login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"pm.test(\"access_token not empty\", function () {",
+									"    pm.expect(jsonData.access_token).not.eql(undefined);",
+									"});",
+									"",
+									"pm.test(\"refresh token not empty\", function () {",
+									"    pm.expect(jsonData.refresh_token).not.eql(undefined);",
+									"});",
+									"// set access token as environement variable",
+									"if (jsonData.access_token !== undefined) {",
+									"    postman.setEnvironmentVariable(\"access_token\", jsonData.access_token);",
+									"} else {",
+									"    postman.setEnvironmentVariable(\"access_token\", null);",
+									"}",
+									"// set refresh token as environement variable",
+									"if (jsonData.refresh_token !== undefined) {",
+									"    postman.setEnvironmentVariable(\"refresh_token\", jsonData.refresh_token);",
+									"} else {",
+									"    postman.setEnvironmentVariable(\"refresh_token\", null);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/login/google",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"login",
+								"google"
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "Check Username",
 					"request": {
 						"method": "GET",
@@ -395,7 +448,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"category\": \"Refill\",\n    \"item\": \"Milk\",\n    \"count\": 4,\n    \"date\": \"2021-01-23 17:03:00\",\n    \"time\": \"2021-01-23 17:03:00\"\n}"
+							"raw": "{\n    \"category\": \"Meeting\",\n    \"data\": \n        { \"url\": \"meet.google.com\",\n        \"documents\": \"book\",\n        \"date_time\": \"2021-02-18T14:26:00+05:30\"\n        }\n}"
 						},
 						"url": {
 							"raw": "{{url}}/cards",
@@ -685,6 +738,130 @@
 							"path": [
 								"diary",
 								"all"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Calendar",
+			"item": [
+				{
+					"name": "Get Calendar",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{access_token}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/calendar/<string:access_token>",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"calendar",
+								"<string:access_token>"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Event",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"start_time\": \"2021-02-09 16:00:00\",\r\n    \"duration\": 1,\r\n    \"summary\": \"IPL\",\r\n    \"description\": \"CSK ftw\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{url}}/calendar/event/<string:access_token>",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"calendar",
+								"event",
+								"<string:access_token>"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Event",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{  \n  \"eventId\": \"5ler1nnp9bsj9pa1m5tmdvgrb0\"\n}"
+						},
+						"url": {
+							"raw": "{{url}}/calendar/delete/ya29.a0AfH6SMATei_e_Lvsw0WyRmmMXke730Kngsh-NxXWw7FpELX3bDA4cc77Ud6HNlH1OXBoZxnmRb4OLptXL5ptXI2gpRvP_4Okmh3oZN5wDCdC_PWwFopBLAsGM--FuffJNSh8ZoV2YbPv5J5nrXbX_340R_7kcFg9OWd_E66Rx5c",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"calendar",
+								"delete",
+								"ya29.a0AfH6SMATei_e_Lvsw0WyRmmMXke730Kngsh-NxXWw7FpELX3bDA4cc77Ud6HNlH1OXBoZxnmRb4OLptXL5ptXI2gpRvP_4Okmh3oZN5wDCdC_PWwFopBLAsGM--FuffJNSh8ZoV2YbPv5J5nrXbX_340R_7kcFg9OWd_E66Rx5c"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all events",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"type": "text",
+								"value": "Bearer {{access_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/calendar/all/<string:access_token>",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"calendar",
+								"all",
+								"<string:access_token>"
 							]
 						}
 					},

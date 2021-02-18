@@ -1,0 +1,40 @@
+Card Types and the format:
+As the card types change based on category and the json body, these are some of the defaults you can choose
+
+Cards:
+
+1. Meeting:
+{
+ "category": "Meeting",
+    "data": 
+        { "url": "meet.google.com",
+        "documents": "book",
+        "date_time": "2021-02-18T14:26:00+05:30"
+        }
+}
+
+2. Reminders:
+{
+    "category": "Reminder",
+    "data": 
+        { 
+            "date_time": ["2021-02-18T14:26:00+05:30", "2021-02-18T14:26:00+05:30"]
+        }
+}
+
+3. Refill:
+{
+    "category": "Refill",
+    "item": "Milk",
+    "count": 20,
+    "date_time": "2021-01-23 15:50:00"
+}
+
+4. Miscallaneous category
+{
+    "category": "xyz",
+    "data": 
+        { 
+            "abc": "efg"
+        }
+}
