@@ -70,6 +70,48 @@ The API is available on https://home-manage.herokuapp.com
 > 1. Diary table
 > 2. Stock table
 
+## List of Endpoints: (The most important ones - refer to Postman Collection for all)
+ 1. Users Endpoints  
+   * __'/register'__  
+   * __'/login'__  
+   * __'/logout'__  
+   * __'/refresh'__  
+   * __'/email_confirm/<int:user_id>'__ 
+   * __'/phone_confirm/<int:user_id>'__  
+   * __'/login/github'__ (Use browser)
+   * __'/login/google'__ (Use browser) 
+
+  2. Cards Enpoints 
+   * __'/cards'__  
+   * __'/cards/<string:_id>'__   
+       * Add  
+       * Edit  
+       * Delete  
+   * __'/cards/all'__ 
+   
+  2. Diary Enpoints 
+   * __'/diary'__  
+   * __'/diary/<string:_id>'__   
+       * Add  
+       * Edit  
+       * Delete  
+   * __'/diary/all'__ 
+   
+  3. Stock Enpoints 
+   * __'/stock'__  
+   * __'/stock/<string:item>'__   
+       * Add  
+       * Edit  
+       * Delete  
+   * __'/stock/all'__ 
+  
+  4. Calendar Enpoints 
+   * __'/calendar/<string:token>'__   
+   * __'/calendar/delete/<string:token>'__  
+   * __'/calendar/event/<string:token>'__  
+   * __'/calendar/all/<string:token>'__   
+   
+
 ## APIs Used
 > 1. Sendgrid API: For sending instant/scheduled emails to user's email address
 > 2. Twilio API: For sending SMS to registered phone numbers
