@@ -57,6 +57,7 @@ class Diary(Resource):
             given_diary = diary_schema.load(body)
             given_diary.id = diary.id
             given_diary.added_by = diary.added_by
+            
             diary.delete_from_data()
             given_diary.save_to_data()
             return {'msg': "Diary has been modified"}, 200
